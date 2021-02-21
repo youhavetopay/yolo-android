@@ -244,11 +244,24 @@ public class TFLiteObjectDetectionAPIModel implements Detector {
       float xValue = ((right-left)/2)+left;
       float yValue = (bottom-top)/2+top;
 
+      // 중앙 좌표값? (300X300기준)
       float[] coordinate = {xValue, yValue};
+
+       final RectF centerLocation =
+              new RectF(
+                      xValue+0,
+                      yValue+0,
+                      xValue+1,
+                      yValue+1
+              );
 
       recognitions.add(
           new Recognition(
-              "" + i, labels.get((int) outputClasses[0][i]), outputScores[0][i], detection, coordinate
+              "" + i,
+                  labels.get((int) outputClasses[0][i]),
+                  outputScores[0][i],
+                  detection,
+                  coordinate
       ));
 
       if(outputScores[0][i] >= 0.5){

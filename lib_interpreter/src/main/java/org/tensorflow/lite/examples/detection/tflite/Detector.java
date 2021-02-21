@@ -16,6 +16,7 @@ limitations under the License.
 package org.tensorflow.lite.examples.detection.tflite;
 
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import java.util.List;
 
@@ -79,7 +80,9 @@ public interface Detector {
       return new RectF(location);
     }
 
-    public float[] getCoordinate(){ return  coordinate; }
+    public float[] getCoordinate(){
+      return  coordinate;
+    }
 
     public void setLocation(RectF location) {
       this.location = location;

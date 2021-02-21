@@ -212,12 +212,16 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
             for (final Detector.Recognition result : results) {
 
               final RectF location = result.getLocation();
+
               if (location != null && result.getConfidence() >= minimumConfidence) {
                 canvas.drawRect(location, paint);
 
                 cropToFrameTransform.mapRect(location);
 
+
                 result.setLocation(location);
+
+
                 mappedRecognitions.add(result);
 
                 float score = Math.round((result.getConfidence()*100.0f)*100.0f)/100.0f;
@@ -226,6 +230,13 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                         +" coordinate_x: "+result.getCoordinate()[0] + " cordinate_y: "+result.getCoordinate()[1]
                         +" score: "+score
                 );
+
+                if(result.getCoordinate()[0] > 150.0f){
+                  System.out.println(result.getTitle()+" is right");
+                }
+                else{
+                  System.out.println(result.getTitle()+" is left");
+                }
               }
             }
 
