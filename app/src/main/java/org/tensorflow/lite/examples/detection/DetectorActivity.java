@@ -228,6 +228,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
                 System.out.println("label: "+result.getTitle()
                         +" coordinate_x: "+result.getCoordinate()[0] + " cordinate_y: "+result.getCoordinate()[1]
+                        +" RectF: "+result.getLocation()
                         +" score: "+score
                 );
 

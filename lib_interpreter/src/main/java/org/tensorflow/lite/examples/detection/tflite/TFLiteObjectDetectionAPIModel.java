@@ -247,14 +247,6 @@ public class TFLiteObjectDetectionAPIModel implements Detector {
       // 중앙 좌표값? (300X300기준)
       float[] coordinate = {xValue, yValue};
 
-       final RectF centerLocation =
-              new RectF(
-                      xValue+0,
-                      yValue+0,
-                      xValue+1,
-                      yValue+1
-              );
-
       recognitions.add(
           new Recognition(
               "" + i,
@@ -272,13 +264,13 @@ public class TFLiteObjectDetectionAPIModel implements Detector {
 //        System.out.println("X_Value: "+(((right-left)/2)+left));
 //        System.out.println("Y_Value: "+((bottom-top)/2+top));
 //
-//        System.out.println(
-//                "labels: "+labels.get((int) outputClasses[0][i])+
-//                        "  letf: "+outputLocations[0][i][1] * inputSize+
-//                        "  top: "+outputLocations[0][i][0] * inputSize+
-//                        "  right: "+outputLocations[0][i][3] * inputSize+
-//                        "  bottom: "+outputLocations[0][i][2] * inputSize+
-//                        "  score: "+outputScores[0][i]);
+        System.out.println(
+                "labels: "+labels.get((int) outputClasses[0][i])+
+                        "  letf: "+outputLocations[0][i][1] * inputSize+
+                        "  top: "+outputLocations[0][i][0] * inputSize+
+                        "  right: "+outputLocations[0][i][3] * inputSize+
+                        "  bottom: "+outputLocations[0][i][2] * inputSize+
+                        "  score: "+outputScores[0][i]);
       }
     }
     Trace.endSection(); // "recognizeImage"
