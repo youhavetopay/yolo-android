@@ -43,6 +43,8 @@ dependencies {
 
     implementation 'org.tensorflow:tensorflow-lite:2.0.0'
 
+    implementation 'org.tensorflow:tensorflow-lite-task-vision:0.1.0'
+
     implementation 'org.tensorflow:tensorflow-lite-support:0.1.0-rc1'
     implementation 'org.tensorflow:tensorflow-lite-metadata:0.1.0-rc1'
     testImplementation 'junit:junit:4.+'
