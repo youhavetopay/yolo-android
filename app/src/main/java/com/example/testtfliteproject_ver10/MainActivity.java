@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -26,17 +27,23 @@ import org.tensorflow.lite.support.image.ImageProcessor;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.support.image.ops.ResizeOp;
 import org.tensorflow.lite.support.label.TensorLabel;
+import org.tensorflow.lite.support.metadata.MetadataExtractor;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 import org.tensorflow.lite.task.vision.detector.Detection;
 import org.tensorflow.lite.task.vision.detector.ObjectDetector;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +52,9 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageView;
     private TextView textView;
 
+    private static final int NUM_DETECTIONS = 2535;
     private String modelFile = "testTFLiteModel.tflite";
+    private final List<String> labels = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,12 +101,29 @@ public class MainActivity extends AppCompatActivity {
                     tImage.load(img);
                     tImage = imageProcessor.process(tImage);
 
-                    TensorBuffer result =
-                            TensorBuffer.createFixedSize(new int[]{1, 2535, 85}, DataType.FLOAT32);
-
                     Interpreter tf_lite = getTfliteInterpreter("yolov4-416-tiny.tflite");
 
-                    tf_lite.run(tImage.getBuffer(), result.getBuffer());
+
+                    float [][][] outputLocations = new float[1][2535][4];
+                    float [][][] outputClass = new float[1][2535][80];
+                    float [] numDetections = new float[1];
+                    Object[] inputArray = {tImage.getBuffer()};
+                    Map<Integer, Object> outputMap = new HashMap<>();
+                    outputMap.put(0, outputLocations);
+                    outputMap.put(1, outputClass);
+
+
+                    tf_lite.runForMultipleInputsOutputs(inputArray, outputMap);
+
+
+                    AssetManager assetManager = getResources().getAssets();
+                    InputStream inputStream1 = assetManager.open("label.txt");
+
+
+                    for(float test : outputLocations[0][0]){
+                        System.out.println("awdawd   "+test);
+                    }
+                    System.out.println("label    "+labels.get((int) outputClass[0][0][0]));
 
 
 //                    final String ASSOCIATED_AXIS_LABELS = "label.txt";
@@ -137,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
     // loadModelFile 함수에 예외가 포함되어 있기 때문에 반드시 try, catch가 필요!
     private Interpreter getTfliteInterpreter(String modelPath){
         try {
-            return new Interpreter(loadModelFile(MainActivity.this, modelPath));
+            return new Interpreter(loadModelFile(MainActivity.this.getAssets(), modelPath));
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -148,8 +174,8 @@ public class MainActivity extends AppCompatActivity {
 
     // 모델 읽어오는 함수 텐서플로우라이트 홈페이지에 있음
     // MappedByteBuffer 바이트 버퍼를 Interpreter객체에 전달하면 모델 해석을 할 수 있음
-    private MappedByteBuffer loadModelFile(Activity activity, String modelPath) throws IOException{
-        AssetFileDescriptor fileDescriptor = activity.getAssets().openFd(modelPath);
+    private MappedByteBuffer loadModelFile(AssetManager assets, String modelPath) throws IOException{
+        AssetFileDescriptor fileDescriptor = assets.openFd(modelPath);
         FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
         FileChannel fileChannel = inputStream.getChannel();
 
