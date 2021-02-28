@@ -130,26 +130,28 @@ public abstract class CameraActivity extends AppCompatActivity
         });
     sheetBehavior.setHideable(false);
 
+
+    // 카메라 화면 Bottom slide view 상태 변활때 화살표 이미지 달라지게 하는 함수
     sheetBehavior.setBottomSheetCallback(
         new BottomSheetBehavior.BottomSheetCallback() {
           @Override
           public void onStateChanged(@NonNull View bottomSheet, int newState) {
             switch (newState) {
-              case BottomSheetBehavior.STATE_HIDDEN:
+              case BottomSheetBehavior.STATE_HIDDEN:  // 아래로 숨겨진 상태
                 break;
-              case BottomSheetBehavior.STATE_EXPANDED:
+              case BottomSheetBehavior.STATE_EXPANDED: // 완전히 펼처진 상태
                 {
                   bottomSheetArrowImageView.setImageResource(R.drawable.icn_chevron_down);
                 }
                 break;
-              case BottomSheetBehavior.STATE_COLLAPSED:
+              case BottomSheetBehavior.STATE_COLLAPSED:  // 접혀있는 상태
                 {
                   bottomSheetArrowImageView.setImageResource(R.drawable.icn_chevron_up);
                 }
                 break;
-              case BottomSheetBehavior.STATE_DRAGGING:
+              case BottomSheetBehavior.STATE_DRAGGING: // 드래깅 되고 있는 상태
                 break;
-              case BottomSheetBehavior.STATE_SETTLING:
+              case BottomSheetBehavior.STATE_SETTLING: // 드래그/ 스와이프 직후 고정된 상태
                 bottomSheetArrowImageView.setImageResource(R.drawable.icn_chevron_up);
                 break;
             }
@@ -183,6 +185,7 @@ public abstract class CameraActivity extends AppCompatActivity
   }
 
   /** Callback for android.hardware.Camera API */
+  // 카메라에서 이미지 가져오는 함수 : android.hardware.Camera는 API 21 부터 더이상 지원안해서 밑에 함수 쓰는 듯
   @Override
   public void onPreviewFrame(final byte[] bytes, final Camera camera) {
     if (isProcessingFrame) {
@@ -228,6 +231,9 @@ public abstract class CameraActivity extends AppCompatActivity
   }
 
   /** Callback for Camera2 API */
+  
+  // 카메라에서 이미지 가져오는 함수
+  // API 21 부터 사용가능
   @Override
   public void onImageAvailable(final ImageReader reader) {
     // We need wait until we have some size from onPreviewSizeChosen
@@ -238,6 +244,7 @@ public abstract class CameraActivity extends AppCompatActivity
       rgbBytes = new int[previewWidth * previewHeight];
     }
     try {
+      // 카메라에서 이미지 가져오기 없으면 null
       final Image image = reader.acquireLatestImage();
 
       if (image == null) {

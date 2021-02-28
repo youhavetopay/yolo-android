@@ -120,6 +120,9 @@ public class MultiBoxTracker {
     return frameToCanvasMatrix;
   }
 
+
+
+  // detect 한 물체 감지 박스랑 title 퍼센트 그리는 함수
   public synchronized void draw(final Canvas canvas) {
     final boolean rotated = sensorOrientation % 180 == 90;
     final float multiplier =
@@ -141,7 +144,10 @@ public class MultiBoxTracker {
       boxPaint.setColor(recognition.color);
 
       float cornerSize = Math.min(trackedPos.width(), trackedPos.height()) / 8.0f;
-      canvas.drawRoundRect(trackedPos, cornerSize, cornerSize, boxPaint);
+
+      // 박스 그리는 함수
+      //canvas.drawRoundRect(trackedPos, cornerSize, cornerSize, boxPaint);
+      canvas.drawRect(trackedPos, boxPaint);
 
       final String labelString =
           !TextUtils.isEmpty(recognition.title)
@@ -149,8 +155,12 @@ public class MultiBoxTracker {
               : String.format("%.2f", (100 * recognition.detectionConfidence));
       //            borderedText.drawText(canvas, trackedPos.left + cornerSize, trackedPos.top,
       // labelString);
+
+      // title이랑 퍼센트 그리는 함수
+//      borderedText.drawText(
+//          canvas, trackedPos.left + cornerSize, trackedPos.top, labelString + "%", boxPaint);
       borderedText.drawText(
-          canvas, trackedPos.left + cornerSize, trackedPos.top, labelString + "%", boxPaint);
+              canvas, trackedPos.left, trackedPos.top, labelString + "%", boxPaint);
     }
   }
 

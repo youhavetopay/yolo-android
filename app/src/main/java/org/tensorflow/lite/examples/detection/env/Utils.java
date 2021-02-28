@@ -72,6 +72,8 @@ public class Utils {
 //        return bitmap;
 //    }
 
+
+    // Assets폴더에 있는 이미지 Bitmap으로 가져오기
     public static Bitmap getBitmapFromAsset(Context context, String filePath) {
         AssetManager assetManager = context.getAssets();
 

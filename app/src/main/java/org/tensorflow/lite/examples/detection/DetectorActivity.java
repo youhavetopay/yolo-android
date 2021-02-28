@@ -199,6 +199,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                         final Paint paint = new Paint();
                         paint.setColor(Color.RED);
                         paint.setStyle(Style.STROKE);
+                        paint.setStrokeJoin(Paint.Join.MITER);
                         paint.setStrokeWidth(2.0f);
 
                         float minimumConfidence = MINIMUM_CONFIDENCE_TF_OD_API;
@@ -220,6 +221,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
                                 System.out.println("label :"+result.getTitle());
                                 System.out.println("location: "+result.getLocation());
+                                System.out.println("width: "+location.width());
+                                System.out.println("height: "+location.height());
                                 System.out.println("center_x: "+location.centerX());
                                 System.out.println("center_y: "+location.centerY());
 

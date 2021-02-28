@@ -26,6 +26,7 @@ import org.tensorflow.lite.examples.detection.tflite.Classifier;
 import org.tensorflow.lite.examples.detection.tflite.YoloV4Classifier;
 import org.tensorflow.lite.examples.detection.tracking.MultiBoxTracker;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +44,10 @@ public class MainActivity extends AppCompatActivity {
         detectButton = findViewById(R.id.detectButton);
         imageView = findViewById(R.id.imageView);
 
+        testMoveButton = findViewById(R.id.testMoveButton);
+
         cameraButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, DetectorActivity.class)));
+
 
         detectButton.setOnClickListener(v -> {
             Handler handler = new Handler();
@@ -53,29 +57,51 @@ public class MainActivity extends AppCompatActivity {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
+                        System.out.println("쓰레드 1");
                         handleResult(cropBitmap, results);
                     }
                 });
             }).start();
 
         });
-        this.sourceBitmap = Utils.getBitmapFromAsset(MainActivity.this, "kite.jpg");
 
+        testMoveButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), TestActivity.class);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            Bitmap moveData  = cropBitmap;
+            moveData.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            byte[] bytes = stream.toByteArray();
+
+            intent.putExtra("image", bytes);
+            startActivity(intent);
+        });
+
+
+
+        // assets 폴더에서 이미지 가져오기
+        this.sourceBitmap = Utils.getBitmapFromAsset(MainActivity.this, "test.jpg");
+
+        // 가져온 이미지 모델 Input사이즈에 맞게 바꾸기
         this.cropBitmap = Utils.processBitmap(sourceBitmap, TF_OD_API_INPUT_SIZE);
 
+        // 가져온 이미지 표시
         this.imageView.setImageBitmap(cropBitmap);
 
+        System.out.println("그냥 1");
         initBox();
     }
 
     private static final Logger LOGGER = new Logger();
 
+    // 입력 크기
     public static final int TF_OD_API_INPUT_SIZE = 416;
 
     private static final boolean TF_OD_API_IS_QUANTIZED = false;
 
+    // 모델
     private static final String TF_OD_API_MODEL_FILE = "yolov4-416-fp32.tflite";
 
+    // 라벨 경로
     private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/coco.txt";
 
     // Minimum detection confidence to track a detection.
@@ -95,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap sourceBitmap;
     private Bitmap cropBitmap;
 
-    private Button cameraButton, detectButton;
+    private Button cameraButton, detectButton, testMoveButton;
     private ImageView imageView;
 
     private void initBox() {
@@ -135,6 +161,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+
+    // 사진에 대한 Object Detect
     private void handleResult(Bitmap bitmap, List<Classifier.Recognition> results) {
         final Canvas canvas = new Canvas(bitmap);
         final Paint paint = new Paint();
