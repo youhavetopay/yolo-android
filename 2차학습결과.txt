@@ -1,0 +1,196 @@
+D:\topDeskTop\DeskTop\zolzac\darknet\darknet-master\build\darknet\x64>darknet.exe detector map mydata/myObjData.data mydata/test_yolov3-tiny.cfg weights/mydata2/train_yolov3-tiny_10000.weights
+ CUDA-version: 11020 (11020), cuDNN: 8.0.5, CUDNN_HALF=1, GPU count: 1
+ CUDNN_HALF=1
+ OpenCV version: 3.2.0
+ 0 : compute_capability = 500, cudnn_half = 0, GPU: GeForce GTX 950M
+net.optimized_memory = 0
+mini_batch = 1, batch = 1, time_steps = 1, train = 0
+   layer   filters  size/strd(dil)      input                output
+   0 conv     33       3 x 3/ 1    416 x 416 x   3 ->  416 x 416 x  33 0.308 BF
+   1 max                2x 2/ 2    416 x 416 x  33 ->  208 x 208 x  33 0.006 BF
+   2 conv     33       3 x 3/ 1    208 x 208 x  33 ->  208 x 208 x  33 0.848 BF
+   3 max                2x 2/ 2    208 x 208 x  33 ->  104 x 104 x  33 0.001 BF
+   4 conv     33       3 x 3/ 1    104 x 104 x  33 ->  104 x 104 x  33 0.212 BF
+   5 max                2x 2/ 2    104 x 104 x  33 ->   52 x  52 x  33 0.000 BF
+   6 conv     33       3 x 3/ 1     52 x  52 x  33 ->   52 x  52 x  33 0.053 BF
+   7 max                2x 2/ 2     52 x  52 x  33 ->   26 x  26 x  33 0.000 BF
+   8 conv     33       3 x 3/ 1     26 x  26 x  33 ->   26 x  26 x  33 0.013 BF
+   9 max                2x 2/ 2     26 x  26 x  33 ->   13 x  13 x  33 0.000 BF
+  10 conv     33       3 x 3/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.003 BF
+  11 max                2x 2/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.000 BF
+  12 conv     33       3 x 3/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.003 BF
+  13 conv     33       1 x 1/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.000 BF
+  14 conv     33       3 x 3/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.003 BF
+  15 conv     33       1 x 1/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.000 BF
+  16 yolo
+[yolo] params: iou loss: mse (2), iou_norm: 0.75, obj_norm: 1.00, cls_norm: 1.00, delta_norm: 1.00, scale_x_y: 1.00
+  17 route  13                                     ->   13 x  13 x  33
+  18 conv     33       1 x 1/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.000 BF
+  19 upsample                 2x    13 x  13 x  33 ->   26 x  26 x  33
+  20 route  19 8                                   ->   26 x  26 x  66
+  21 conv     33       3 x 3/ 1     26 x  26 x  66 ->   26 x  26 x  33 0.027 BF
+  22 conv     33       1 x 1/ 1     26 x  26 x  33 ->   26 x  26 x  33 0.001 BF
+  23 yolo
+[yolo] params: iou loss: mse (2), iou_norm: 0.75, obj_norm: 1.00, cls_norm: 1.00, delta_norm: 1.00, scale_x_y: 1.00
+Total BFLOPS 1.481
+avg_outputs = 403867
+ Allocate additional workspace_size = 0.00 MB
+Loading weights from weights/mydata2/train_yolov3-tiny_10000.weights...
+ seen 64, trained: 640 K-images (10 Kilo-batches_64)
+Done! Loaded 24 layers from weights-file
+
+ calculation mAP (mean average precision)...
+ Detection layer: 16 - type = 28
+ Detection layer: 23 - type = 28
+360
+ detections_count = 2962, unique_truth_count = 426
+class_id = 0, name = beanSprouts, ap = 83.80%            (TP = 54, FP = 10)
+class_id = 1, name = whiteRice, ap = 77.11%      (TP = 41, FP = 10)
+class_id = 2, name = porkCutlet, ap = 42.10%     (TP = 13, FP = 5)
+class_id = 3, name = spinach, ap = 83.81%        (TP = 49, FP = 5)
+class_id = 4, name = spoon, ap = 78.64%          (TP = 45, FP = 3)
+class_id = 5, name = Bulgogi, ap = 80.50%        (TP = 46, FP = 19)
+
+ for conf_thresh = 0.25, precision = 0.83, recall = 0.58, F1-score = 0.68
+ for conf_thresh = 0.25, TP = 248, FP = 52, FN = 178, average IoU = 62.00 %
+
+ IoU threshold = 50 %, used Area-Under-Curve for each unique Recall
+ mean average precision (mAP@0.50) = 0.743259, or 74.33 %
+Total Detection Time: 11 Seconds
+
+Set -points flag:
+ `-points 101` for MS COCO
+ `-points 11` for PascalVOC 2007 (uncomment `difficult` in voc.data)
+ `-points 0` (AUC) for ImageNet, PascalVOC 2010-2012, your custom dataset
+
+D:\topDeskTop\DeskTop\zolzac\darknet\darknet-master\build\darknet\x64>darknet.exe detector map mydata/myObjData.data mydata/test_yolov3-tiny.cfg weights/mydata2/train_yolov3-tiny_final.weights
+ CUDA-version: 11020 (11020), cuDNN: 8.0.5, CUDNN_HALF=1, GPU count: 1
+ CUDNN_HALF=1
+ OpenCV version: 3.2.0
+ 0 : compute_capability = 500, cudnn_half = 0, GPU: GeForce GTX 950M
+net.optimized_memory = 0
+mini_batch = 1, batch = 1, time_steps = 1, train = 0
+   layer   filters  size/strd(dil)      input                output
+   0 conv     33       3 x 3/ 1    416 x 416 x   3 ->  416 x 416 x  33 0.308 BF
+   1 max                2x 2/ 2    416 x 416 x  33 ->  208 x 208 x  33 0.006 BF
+   2 conv     33       3 x 3/ 1    208 x 208 x  33 ->  208 x 208 x  33 0.848 BF
+   3 max                2x 2/ 2    208 x 208 x  33 ->  104 x 104 x  33 0.001 BF
+   4 conv     33       3 x 3/ 1    104 x 104 x  33 ->  104 x 104 x  33 0.212 BF
+   5 max                2x 2/ 2    104 x 104 x  33 ->   52 x  52 x  33 0.000 BF
+   6 conv     33       3 x 3/ 1     52 x  52 x  33 ->   52 x  52 x  33 0.053 BF
+   7 max                2x 2/ 2     52 x  52 x  33 ->   26 x  26 x  33 0.000 BF
+   8 conv     33       3 x 3/ 1     26 x  26 x  33 ->   26 x  26 x  33 0.013 BF
+   9 max                2x 2/ 2     26 x  26 x  33 ->   13 x  13 x  33 0.000 BF
+  10 conv     33       3 x 3/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.003 BF
+  11 max                2x 2/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.000 BF
+  12 conv     33       3 x 3/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.003 BF
+  13 conv     33       1 x 1/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.000 BF
+  14 conv     33       3 x 3/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.003 BF
+  15 conv     33       1 x 1/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.000 BF
+  16 yolo
+[yolo] params: iou loss: mse (2), iou_norm: 0.75, obj_norm: 1.00, cls_norm: 1.00, delta_norm: 1.00, scale_x_y: 1.00
+  17 route  13                                     ->   13 x  13 x  33
+  18 conv     33       1 x 1/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.000 BF
+  19 upsample                 2x    13 x  13 x  33 ->   26 x  26 x  33
+  20 route  19 8                                   ->   26 x  26 x  66
+  21 conv     33       3 x 3/ 1     26 x  26 x  66 ->   26 x  26 x  33 0.027 BF
+  22 conv     33       1 x 1/ 1     26 x  26 x  33 ->   26 x  26 x  33 0.001 BF
+  23 yolo
+[yolo] params: iou loss: mse (2), iou_norm: 0.75, obj_norm: 1.00, cls_norm: 1.00, delta_norm: 1.00, scale_x_y: 1.00
+Total BFLOPS 1.481
+avg_outputs = 403867
+ Allocate additional workspace_size = 0.00 MB
+Loading weights from weights/mydata2/train_yolov3-tiny_final.weights...
+ seen 64, trained: 780 K-images (12 Kilo-batches_64)
+Done! Loaded 24 layers from weights-file
+
+ calculation mAP (mean average precision)...
+ Detection layer: 16 - type = 28
+ Detection layer: 23 - type = 28
+360
+ detections_count = 1916, unique_truth_count = 426
+class_id = 0, name = beanSprouts, ap = 79.78%            (TP = 38, FP = 4)
+class_id = 1, name = whiteRice, ap = 78.45%      (TP = 32, FP = 4)
+class_id = 2, name = porkCutlet, ap = 34.75%     (TP = 5, FP = 1)
+class_id = 3, name = spinach, ap = 79.43%        (TP = 36, FP = 3)
+class_id = 4, name = spoon, ap = 77.88%          (TP = 38, FP = 1)
+class_id = 5, name = Bulgogi, ap = 79.49%        (TP = 30, FP = 8)
+
+ for conf_thresh = 0.25, precision = 0.89, recall = 0.42, F1-score = 0.57
+ for conf_thresh = 0.25, TP = 179, FP = 21, FN = 247, average IoU = 67.53 %
+
+ IoU threshold = 50 %, used Area-Under-Curve for each unique Recall
+ mean average precision (mAP@0.50) = 0.716300, or 71.63 %
+Total Detection Time: 10 Seconds
+
+Set -points flag:
+ `-points 101` for MS COCO
+ `-points 11` for PascalVOC 2007 (uncomment `difficult` in voc.data)
+ `-points 0` (AUC) for ImageNet, PascalVOC 2010-2012, your custom dataset
+
+D:\topDeskTop\DeskTop\zolzac\darknet\darknet-master\build\darknet\x64>darknet.exe detector map mydata/myObjData.data mydata/test_yolov3-tiny.cfg weights/mydata2/train_yolov3-tiny_last.weights
+ CUDA-version: 11020 (11020), cuDNN: 8.0.5, CUDNN_HALF=1, GPU count: 1
+ CUDNN_HALF=1
+ OpenCV version: 3.2.0
+ 0 : compute_capability = 500, cudnn_half = 0, GPU: GeForce GTX 950M
+net.optimized_memory = 0
+mini_batch = 1, batch = 1, time_steps = 1, train = 0
+   layer   filters  size/strd(dil)      input                output
+   0 conv     33       3 x 3/ 1    416 x 416 x   3 ->  416 x 416 x  33 0.308 BF
+   1 max                2x 2/ 2    416 x 416 x  33 ->  208 x 208 x  33 0.006 BF
+   2 conv     33       3 x 3/ 1    208 x 208 x  33 ->  208 x 208 x  33 0.848 BF
+   3 max                2x 2/ 2    208 x 208 x  33 ->  104 x 104 x  33 0.001 BF
+   4 conv     33       3 x 3/ 1    104 x 104 x  33 ->  104 x 104 x  33 0.212 BF
+   5 max                2x 2/ 2    104 x 104 x  33 ->   52 x  52 x  33 0.000 BF
+   6 conv     33       3 x 3/ 1     52 x  52 x  33 ->   52 x  52 x  33 0.053 BF
+   7 max                2x 2/ 2     52 x  52 x  33 ->   26 x  26 x  33 0.000 BF
+   8 conv     33       3 x 3/ 1     26 x  26 x  33 ->   26 x  26 x  33 0.013 BF
+   9 max                2x 2/ 2     26 x  26 x  33 ->   13 x  13 x  33 0.000 BF
+  10 conv     33       3 x 3/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.003 BF
+  11 max                2x 2/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.000 BF
+  12 conv     33       3 x 3/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.003 BF
+  13 conv     33       1 x 1/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.000 BF
+  14 conv     33       3 x 3/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.003 BF
+  15 conv     33       1 x 1/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.000 BF
+  16 yolo
+[yolo] params: iou loss: mse (2), iou_norm: 0.75, obj_norm: 1.00, cls_norm: 1.00, delta_norm: 1.00, scale_x_y: 1.00
+  17 route  13                                     ->   13 x  13 x  33
+  18 conv     33       1 x 1/ 1     13 x  13 x  33 ->   13 x  13 x  33 0.000 BF
+  19 upsample                 2x    13 x  13 x  33 ->   26 x  26 x  33
+  20 route  19 8                                   ->   26 x  26 x  66
+  21 conv     33       3 x 3/ 1     26 x  26 x  66 ->   26 x  26 x  33 0.027 BF
+  22 conv     33       1 x 1/ 1     26 x  26 x  33 ->   26 x  26 x  33 0.001 BF
+  23 yolo
+[yolo] params: iou loss: mse (2), iou_norm: 0.75, obj_norm: 1.00, cls_norm: 1.00, delta_norm: 1.00, scale_x_y: 1.00
+Total BFLOPS 1.481
+avg_outputs = 403867
+ Allocate additional workspace_size = 0.00 MB
+Loading weights from weights/mydata2/train_yolov3-tiny_last.weights...
+ seen 64, trained: 780 K-images (12 Kilo-batches_64)
+Done! Loaded 24 layers from weights-file
+
+ calculation mAP (mean average precision)...
+ Detection layer: 16 - type = 28
+ Detection layer: 23 - type = 28
+360
+ detections_count = 1916, unique_truth_count = 426
+class_id = 0, name = beanSprouts, ap = 79.78%            (TP = 38, FP = 4)
+class_id = 1, name = whiteRice, ap = 78.45%      (TP = 32, FP = 4)
+class_id = 2, name = porkCutlet, ap = 34.75%     (TP = 5, FP = 1)
+class_id = 3, name = spinach, ap = 79.43%        (TP = 36, FP = 3)
+class_id = 4, name = spoon, ap = 77.88%          (TP = 38, FP = 1)
+class_id = 5, name = Bulgogi, ap = 79.49%        (TP = 30, FP = 8)
+
+ for conf_thresh = 0.25, precision = 0.89, recall = 0.42, F1-score = 0.57
+ for conf_thresh = 0.25, TP = 179, FP = 21, FN = 247, average IoU = 67.53 %
+
+ IoU threshold = 50 %, used Area-Under-Curve for each unique Recall
+ mean average precision (mAP@0.50) = 0.716300, or 71.63 %
+Total Detection Time: 9 Seconds
+
+Set -points flag:
+ `-points 101` for MS COCO
+ `-points 11` for PascalVOC 2007 (uncomment `difficult` in voc.data)
+ `-points 0` (AUC) for ImageNet, PascalVOC 2010-2012, your custom dataset
+
+D:\topDeskTop\DeskTop\zolzac\darknet\darknet-master\build\darknet\x64>
