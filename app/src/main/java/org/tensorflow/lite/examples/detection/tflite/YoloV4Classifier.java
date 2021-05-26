@@ -18,6 +18,7 @@ import android.graphics.RectF;
 import android.os.Build;
 import android.os.Trace;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -27,6 +28,7 @@ import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -376,8 +378,9 @@ public class YoloV4Classifier implements Classifier {
      * For yolov4-tiny, the situation would be a little different from the yolov4, it only has two
      * output. Both has three dimenstion. The first one is a tensor with dimension [1, 2535,4], containing all the bounding boxes.
      * The second one is a tensor with dimension [1, 2535, class_num], containing all the classes score.
+     *
      * @param byteBuffer input ByteBuffer, which contains the image information
-     * @param bitmap pixel disenty used to resize the output images
+     * @param bitmap     pixel disenty used to resize the output images
      * @return an array list containing the recognitions
      */
 
@@ -390,24 +393,24 @@ public class YoloV4Classifier implements Classifier {
         tfLite.runForMultipleInputsOutputs(inputArray, outputMap);
 
         int gridWidth = OUTPUT_WIDTH_FULL[0];
-        float[][][] bboxes = (float [][][]) outputMap.get(0);
+        float[][][] bboxes = (float[][][]) outputMap.get(0);
         float[][][] out_score = (float[][][]) outputMap.get(1);
 
-        for (int i = 0; i < gridWidth;i++){
+        for (int i = 0; i < gridWidth; i++) {
             float maxClass = 0;
             int detectedClass = -1;
             final float[] classes = new float[labels.size()];
-            for (int c = 0;c< labels.size();c++){
-                classes [c] = out_score[0][i][c];
+            for (int c = 0; c < labels.size(); c++) {
+                classes[c] = out_score[0][i][c];
             }
-            for (int c = 0;c<labels.size();++c){
-                if (classes[c] > maxClass){
+            for (int c = 0; c < labels.size(); ++c) {
+                if (classes[c] > maxClass) {
                     detectedClass = c;
                     maxClass = classes[c];
                 }
             }
             final float score = maxClass;
-            if (score > getObjThresh()){
+            if (score > getObjThresh()) {
                 final float xPos = bboxes[0][i][0];
                 final float yPos = bboxes[0][i][1];
                 final float w = bboxes[0][i][2];
@@ -417,51 +420,116 @@ public class YoloV4Classifier implements Classifier {
                         Math.max(0, yPos - h / 2),
                         Math.min(bitmap.getWidth() - 1, xPos + w / 2),
                         Math.min(bitmap.getHeight() - 1, yPos + h / 2));
-                detections.add(new Recognition("" + i, labels.get(detectedClass),score,rectF,detectedClass ));
+                detections.add(new Recognition("" + i, labels.get(detectedClass), score, rectF, detectedClass));
             }
         }
         return detections;
     }
 
     private ArrayList<Recognition> getDetectionsForTiny(ByteBuffer byteBuffer, Bitmap bitmap) {
+        Log.d("izone", "타이니 Detection start");
         ArrayList<Recognition> detections = new ArrayList<Recognition>();
         Map<Integer, Object> outputMap = new HashMap<>();
-        outputMap.put(0, new float[1][OUTPUT_WIDTH_TINY[0]][labels.size()]);
-        outputMap.put(1, new float[1][OUTPUT_WIDTH_TINY[1]][4]);
+        outputMap.put(0, new float[1][OUTPUT_WIDTH_TINY[0]][7]);
         Object[] inputArray = {byteBuffer};
         tfLite.runForMultipleInputsOutputs(inputArray, outputMap);
 
-        int gridWidth = OUTPUT_WIDTH_TINY[0];
-        float[][][] bboxes = (float [][][]) outputMap.get(1);
-        float[][][] out_score = (float[][][]) outputMap.get(0);
+        /*
+         * 출력값 형태 1, 2535, 7
+         *  1: 그냥 한개?
+         *  2535: 아마 한번에 찾을 수 있는 오브젝트의 수(제한 정도?)
+         *  7: 일단 0 ~ 3까지 box값 4 : confidence?(신뢰도??) 값   5 ~ 6까지는 클래스의 확률 값???
+         *
+         *
+         *   계산하는 방법
+         *  1. 0 ~ 3은 검출된 박스값임
+         *  2. 4번째 값이랑 5, 6 번째 값 곱하기
+         *  3. 2번에서 계산한 값들의 최대값이랑 최대값의 인덱스 값 구하기
+         *  4. 2535개의 검출값 중에서 confidence값이랑 같거나 큰값으로 거르고 해당 값의 인덱스값 구하기
+         *
+         * */
 
-        for (int i = 0; i < gridWidth;i++){
-            float maxClass = 0;
-            int detectedClass = -1;
-            final float[] classes = new float[labels.size()];
-            for (int c = 0;c< labels.size();c++){
-                classes [c] = out_score[0][i][c];
-            }
-            for (int c = 0;c<labels.size();++c){
-                if (classes[c] > maxClass){
-                    detectedClass = c;
-                    maxClass = classes[c];
-                }
-            }
-            final float score = maxClass;
-            if (score > getObjThresh()){
-                final float xPos = bboxes[0][i][0];
-                final float yPos = bboxes[0][i][1];
-                final float w = bboxes[0][i][2];
-                final float h = bboxes[0][i][3];
-                final RectF rectF = new RectF(
-                        Math.max(0, xPos - w / 2),
-                        Math.max(0, yPos - h / 2),
-                        Math.min(bitmap.getWidth() - 1, xPos + w / 2),
-                        Math.min(bitmap.getHeight() - 1, yPos + h / 2));
-                detections.add(new Recognition("" + i, labels.get(detectedClass),score,rectF,detectedClass ));
-            }
+        float[][][] results = (float[][][]) outputMap.get(0);
+
+        ArrayList<DetectionObject> detectionObjects = new ArrayList<>();
+
+        final float confidence = 0.6f;
+        for (int i=0; i< results[0][0].length; i++){
+            System.out.println(results[0][0][i]);
         }
+
+        // 일단 현재 모델의 클래스값이 2개라서 클래스 추가하면 나중에 바꾸기  21.05.26
+//        for (int i = 0; i < OUTPUT_WIDTH_TINY[0]; i++) {
+//
+//            // 이부분 나중에 클래스 추가하면 바꾸기
+//            float a = results[0][i][4] * results[0][i][5];
+//            float b = results[0][i][4] * results[0][i][6];
+//
+//            int classIndex = -1;
+//
+//            Log.d("izone", i+" 번째 값" + a + "  " + b);
+//            // 이부분 나중에 클래스 추가하면 바꾸기
+//            if (a >= confidence || b >= confidence) {
+//                float[] boxValue = new float[4];
+//                float maxProbability = 0f;
+//                if (a >= b) {
+//                    classIndex = 0;
+//                    maxProbability = a;
+//                } else {
+//                    classIndex = 1;
+//                    maxProbability = b;
+//                }
+//                boxValue[0] = results[0][i][0];
+//                boxValue[1] = results[0][i][1];
+//                boxValue[2] = results[0][i][2];
+//                boxValue[3] = results[0][i][3];
+//
+//                // 값이 이상하게 튀는것을 뺄려고 제한 걸어둠
+//
+//                Log.d("izone", "타이니 Detection " + i);
+//                detectionObjects.add(new DetectionObject(boxValue, i, classIndex, maxProbability));
+//
+//            }
+//        }
+        Log.d("izone", "타이니 Detection end");
+        for (DetectionObject object : detectionObjects) {
+            System.out.println(object);
+        }
+
+        detectionObjects.clear();
+
+
+//        int gridWidth = OUTPUT_WIDTH_TINY[0];
+//        float[][][] bboxes = (float[][][]) outputMap.get(1);
+//        float[][][] out_score = (float[][][]) outputMap.get(0);
+//
+//        for (int i = 0; i < gridWidth; i++) {
+//            float maxClass = 0;
+//            int detectedClass = -1;
+//            final float[] classes = new float[labels.size()];
+//            for (int c = 0; c < labels.size(); c++) {
+//                classes[c] = out_score[0][i][c];
+//            }
+//            for (int c = 0; c < labels.size(); ++c) {
+//                if (classes[c] > maxClass) {
+//                    detectedClass = c;
+//                    maxClass = classes[c];
+//                }
+//            }
+//            final float score = maxClass;
+//            if (score > getObjThresh()) {
+//                final float xPos = bboxes[0][i][0];
+//                final float yPos = bboxes[0][i][1];
+//                final float w = bboxes[0][i][2];
+//                final float h = bboxes[0][i][3];
+//                final RectF rectF = new RectF(
+//                        Math.max(0, xPos - w / 2),
+//                        Math.max(0, yPos - h / 2),
+//                        Math.min(bitmap.getWidth() - 1, xPos + w / 2),
+//                        Math.min(bitmap.getHeight() - 1, yPos + h / 2));
+//                detections.add(new Recognition("" + i, labels.get(detectedClass), score, rectF, detectedClass));
+//            }
+//        }
         return detections;
     }
 
@@ -595,5 +663,45 @@ public class YoloV4Classifier implements Classifier {
         }
 
         return true;
+    }
+}
+
+class DetectionObject {
+    private final float[] boundingBox;
+    private final int classIndex;
+    private final int location;
+    private final float classProbability;
+
+    public DetectionObject(float[] box, int loc, int classIndex, float classScore) {
+        this.boundingBox = box;
+        this.location = loc;
+        this.classIndex = classIndex;
+        this.classProbability = classScore;
+    }
+
+    public int getLocation() {
+        return location;
+    }
+
+    public float getClassProbability() {
+        return classProbability;
+    }
+
+    public float[] getBoundingBox() {
+        return boundingBox;
+    }
+
+    public int getClassIndex() {
+        return classIndex;
+    }
+
+    @Override
+    public String toString() {
+        return "DetectionObject{" +
+                "boundingBox=" + Arrays.toString(boundingBox) +
+                ", classIndex=" + classIndex +
+                ", location=" + location +
+                ", classProbability=" + classProbability +
+                '}';
     }
 }

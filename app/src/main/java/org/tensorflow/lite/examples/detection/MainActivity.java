@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
             }).start();
 
         });
-        this.sourceBitmap = Utils.getBitmapFromAsset(MainActivity.this, "485.jpg");
+        this.sourceBitmap = Utils.getBitmapFromAsset(MainActivity.this, "169.jpg");
 
         this.cropBitmap = Utils.processBitmap(sourceBitmap, TF_OD_API_INPUT_SIZE);
 
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final boolean TF_OD_API_IS_QUANTIZED = false;
 
-    private static final String TF_OD_API_MODEL_FILE = "yolov3-416.tflite";
+    private static final String TF_OD_API_MODEL_FILE = "yolov3-tiny.tflite";
 
     private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/myClass.txt";
 
