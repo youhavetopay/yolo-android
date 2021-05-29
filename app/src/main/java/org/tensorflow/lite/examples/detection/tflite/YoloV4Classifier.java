@@ -427,14 +427,19 @@ public class YoloV4Classifier implements Classifier {
     }
 
     private ArrayList<Recognition> getDetectionsForTiny(ByteBuffer byteBuffer, Bitmap bitmap) {
+        
+        // 왜 이러는지는 모르겠는데 카메라를 통해 하는거랑 이미지를 하는거 출력 map의 위치를 바꿔야 함 ㅋㅋ
+        
         Log.d("izone", "타이니 Detection start");
         ArrayList<Recognition> detections = new ArrayList<Recognition>();
         Map<Integer, Object> outputMap = new HashMap<>();
-        outputMap.put(0, new float[1][OUTPUT_WIDTH_TINY[0]][7]);
+        outputMap.put(0, new float[1][OUTPUT_WIDTH_TINY[0]][2]);
+        outputMap.put(1, new float[1][OUTPUT_WIDTH_TINY[1]][4]);
         Object[] inputArray = {byteBuffer};
         tfLite.runForMultipleInputsOutputs(inputArray, outputMap);
 
         /*
+           이거는 YOLO3기준이고 현재는 YOLO4로 바꿔서 필요없음  21.05.29
          * 출력값 형태 1, 2535, 7
          *  1: 그냥 한개?
          *  2535: 아마 한번에 찾을 수 있는 오브젝트의 수(제한 정도?)
@@ -449,87 +454,37 @@ public class YoloV4Classifier implements Classifier {
          *
          * */
 
-        float[][][] results = (float[][][]) outputMap.get(0);
+        int gridWidth = OUTPUT_WIDTH_TINY[0];
+        float[][][] bboxes = (float[][][]) outputMap.get(1);
+        float[][][] out_score = (float[][][]) outputMap.get(0);
 
-        ArrayList<DetectionObject> detectionObjects = new ArrayList<>();
-
-        final float confidence = 0.6f;
-        for (int i=0; i< results[0][0].length; i++){
-            System.out.println(results[0][0][i]);
+        for (int i = 0; i < gridWidth; i++) {
+            float maxClass = 0;
+            int detectedClass = -1;
+            final float[] classes = new float[labels.size()];
+            for (int c = 0; c < labels.size(); c++) {
+                classes[c] = out_score[0][i][c];
+            }
+            for (int c = 0; c < labels.size(); ++c) {
+                if (classes[c] > maxClass) {
+                    detectedClass = c;
+                    maxClass = classes[c];
+                }
+            }
+            final float score = maxClass;
+            if (score > getObjThresh()) {
+                final float xPos = bboxes[0][i][0];
+                final float yPos = bboxes[0][i][1];
+                final float w = bboxes[0][i][2];
+                final float h = bboxes[0][i][3];
+                final RectF rectF = new RectF(
+                        Math.max(0, xPos - w / 2),
+                        Math.max(0, yPos - h / 2),
+                        Math.min(bitmap.getWidth() - 1, xPos + w / 2),
+                        Math.min(bitmap.getHeight() - 1, yPos + h / 2));
+                detections.add(new Recognition("" + i, labels.get(detectedClass), score, rectF, detectedClass));
+            }
         }
-
-        // 일단 현재 모델의 클래스값이 2개라서 클래스 추가하면 나중에 바꾸기  21.05.26
-//        for (int i = 0; i < OUTPUT_WIDTH_TINY[0]; i++) {
-//
-//            // 이부분 나중에 클래스 추가하면 바꾸기
-//            float a = results[0][i][4] * results[0][i][5];
-//            float b = results[0][i][4] * results[0][i][6];
-//
-//            int classIndex = -1;
-//
-//            Log.d("izone", i+" 번째 값" + a + "  " + b);
-//            // 이부분 나중에 클래스 추가하면 바꾸기
-//            if (a >= confidence || b >= confidence) {
-//                float[] boxValue = new float[4];
-//                float maxProbability = 0f;
-//                if (a >= b) {
-//                    classIndex = 0;
-//                    maxProbability = a;
-//                } else {
-//                    classIndex = 1;
-//                    maxProbability = b;
-//                }
-//                boxValue[0] = results[0][i][0];
-//                boxValue[1] = results[0][i][1];
-//                boxValue[2] = results[0][i][2];
-//                boxValue[3] = results[0][i][3];
-//
-//                // 값이 이상하게 튀는것을 뺄려고 제한 걸어둠
-//
-//                Log.d("izone", "타이니 Detection " + i);
-//                detectionObjects.add(new DetectionObject(boxValue, i, classIndex, maxProbability));
-//
-//            }
-//        }
-        Log.d("izone", "타이니 Detection end");
-        for (DetectionObject object : detectionObjects) {
-            System.out.println(object);
-        }
-
-        detectionObjects.clear();
-
-
-//        int gridWidth = OUTPUT_WIDTH_TINY[0];
-//        float[][][] bboxes = (float[][][]) outputMap.get(1);
-//        float[][][] out_score = (float[][][]) outputMap.get(0);
-//
-//        for (int i = 0; i < gridWidth; i++) {
-//            float maxClass = 0;
-//            int detectedClass = -1;
-//            final float[] classes = new float[labels.size()];
-//            for (int c = 0; c < labels.size(); c++) {
-//                classes[c] = out_score[0][i][c];
-//            }
-//            for (int c = 0; c < labels.size(); ++c) {
-//                if (classes[c] > maxClass) {
-//                    detectedClass = c;
-//                    maxClass = classes[c];
-//                }
-//            }
-//            final float score = maxClass;
-//            if (score > getObjThresh()) {
-//                final float xPos = bboxes[0][i][0];
-//                final float yPos = bboxes[0][i][1];
-//                final float w = bboxes[0][i][2];
-//                final float h = bboxes[0][i][3];
-//                final RectF rectF = new RectF(
-//                        Math.max(0, xPos - w / 2),
-//                        Math.max(0, yPos - h / 2),
-//                        Math.min(bitmap.getWidth() - 1, xPos + w / 2),
-//                        Math.min(bitmap.getHeight() - 1, yPos + h / 2));
-//                detections.add(new Recognition("" + i, labels.get(detectedClass), score, rectF, detectedClass));
-//            }
-//        }
         return detections;
     }
 
