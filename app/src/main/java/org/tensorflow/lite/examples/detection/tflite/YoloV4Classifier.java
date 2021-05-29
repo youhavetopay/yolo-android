@@ -17,6 +17,7 @@ import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.os.Build;
 import android.os.Trace;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
@@ -32,6 +33,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Vector;
@@ -50,6 +52,8 @@ import static org.tensorflow.lite.examples.detection.env.Utils.softmax;
 import org.tensorflow.lite.Interpreter;
 import org.tensorflow.lite.gpu.GpuDelegate;
 import org.tensorflow.lite.nnapi.NnApiDelegate;
+
+import static android.speech.tts.TextToSpeech.ERROR;
 
 /**
  * Wrapper for frozen detection models trained using the Tensorflow Object Detection API:
@@ -191,6 +195,8 @@ public class YoloV4Classifier implements Classifier {
     private static final float[] XYSCALE_TINY = new float[]{1.05f, 1.05f};
 
     private boolean isModelQuantized;
+
+    private TextToSpeech tts;
 
     // Config values.
 
@@ -433,13 +439,14 @@ public class YoloV4Classifier implements Classifier {
         Log.d("izone", "타이니 Detection start");
         ArrayList<Recognition> detections = new ArrayList<Recognition>();
         Map<Integer, Object> outputMap = new HashMap<>();
-        outputMap.put(0, new float[1][OUTPUT_WIDTH_TINY[0]][2]);
-        outputMap.put(1, new float[1][OUTPUT_WIDTH_TINY[1]][4]);
+        // 클래스 추가되면 첫번째 outputMap 크기 변경하기
+        outputMap.put(0, new float[1][OUTPUT_WIDTH_TINY[0]][4]);
+        outputMap.put(1, new float[1][OUTPUT_WIDTH_TINY[1]][2]);
         Object[] inputArray = {byteBuffer};
         tfLite.runForMultipleInputsOutputs(inputArray, outputMap);
 
         /*
-           이거는 YOLO3기준이고 현재는 YOLO4로 바꿔서 필요없음  21.05.29
+         * 이거는 YOLO3기준이고 현재는 YOLO4로 바꿔서 필요없음  21.05.29
          * 출력값 형태 1, 2535, 7
          *  1: 그냥 한개?
          *  2535: 아마 한번에 찾을 수 있는 오브젝트의 수(제한 정도?)
@@ -455,8 +462,10 @@ public class YoloV4Classifier implements Classifier {
          * */
 
         int gridWidth = OUTPUT_WIDTH_TINY[0];
-        float[][][] bboxes = (float[][][]) outputMap.get(1);
-        float[][][] out_score = (float[][][]) outputMap.get(0);
+        float[][][] bboxes = (float[][][]) outputMap.get(0);
+        float[][][] out_score = (float[][][]) outputMap.get(1);
+
+        int flag = 0;
 
         for (int i = 0; i < gridWidth; i++) {
             float maxClass = 0;
@@ -482,7 +491,30 @@ public class YoloV4Classifier implements Classifier {
                         Math.max(0, yPos - h / 2),
                         Math.min(bitmap.getWidth() - 1, xPos + w / 2),
                         Math.min(bitmap.getHeight() - 1, yPos + h / 2));
+                if (detectedClass == 0){
+                    TableWare.getInstance().setLocation(rectF);
+                    flag = 1;
+                }
                 detections.add(new Recognition("" + i, labels.get(detectedClass), score, rectF, detectedClass));
+            }
+        }
+        if(flag != 1){
+            TableWare.getInstance().setLocation(null);
+            TableWare.getInstance().setTargetName(null);
+            flag = 0;
+        }
+        else{
+            RectF spoon = TableWare.getInstance().getLocation();
+            for(Recognition detection: detections){
+                // spoon이 아닐때
+                if (detection.getDetectedClass() != 0){
+                    Log.d("IOU", ""+box_iou(spoon, detection.getLocation()));
+                    if(box_iou(spoon, detection.getLocation()) > 0.1f){
+                        TableWare.getInstance().setTargetName(detection.getTitle());
+                    }
+
+                }
+                
             }
         }
         return detections;
@@ -618,45 +650,5 @@ public class YoloV4Classifier implements Classifier {
         }
 
         return true;
-    }
-}
-
-class DetectionObject {
-    private final float[] boundingBox;
-    private final int classIndex;
-    private final int location;
-    private final float classProbability;
-
-    public DetectionObject(float[] box, int loc, int classIndex, float classScore) {
-        this.boundingBox = box;
-        this.location = loc;
-        this.classIndex = classIndex;
-        this.classProbability = classScore;
-    }
-
-    public int getLocation() {
-        return location;
-    }
-
-    public float getClassProbability() {
-        return classProbability;
-    }
-
-    public float[] getBoundingBox() {
-        return boundingBox;
-    }
-
-    public int getClassIndex() {
-        return classIndex;
-    }
-
-    @Override
-    public String toString() {
-        return "DetectionObject{" +
-                "boundingBox=" + Arrays.toString(boundingBox) +
-                ", classIndex=" + classIndex +
-                ", location=" + location +
-                ", classProbability=" + classProbability +
-                '}';
     }
 }

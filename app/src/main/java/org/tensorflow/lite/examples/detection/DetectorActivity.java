@@ -27,6 +27,7 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.media.ImageReader.OnImageAvailableListener;
 import android.os.SystemClock;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.util.Size;
 import android.util.TypedValue;
@@ -35,6 +36,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import org.tensorflow.lite.examples.detection.customview.OverlayView;
 import org.tensorflow.lite.examples.detection.customview.OverlayView.DrawCallback;
@@ -42,6 +44,7 @@ import org.tensorflow.lite.examples.detection.env.BorderedText;
 import org.tensorflow.lite.examples.detection.env.ImageUtils;
 import org.tensorflow.lite.examples.detection.env.Logger;
 import org.tensorflow.lite.examples.detection.tflite.Classifier;
+import org.tensorflow.lite.examples.detection.tflite.TableWare;
 import org.tensorflow.lite.examples.detection.tflite.YoloV4Classifier;
 import org.tensorflow.lite.examples.detection.tracking.MultiBoxTracker;
 
@@ -85,6 +88,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     private BorderedText borderedText;
 
+    private TextToSpeech tts;
+
     @Override
     public void onPreviewSizeChosen(final Size size, final int rotation) {
         final float textSizePx =
@@ -92,7 +97,12 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                         TypedValue.COMPLEX_UNIT_DIP, TEXT_SIZE_DIP, getResources().getDisplayMetrics());
         borderedText = new BorderedText(textSizePx);
         borderedText.setTypeface(Typeface.MONOSPACE);
-
+        tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+                tts.setLanguage(Locale.KOREAN);
+            }
+        });
         tracker = new MultiBoxTracker(this);
 
         int cropSize = TF_OD_API_INPUT_SIZE;
@@ -212,7 +222,9 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                             final RectF location = result.getLocation();
                             if (location != null && result.getConfidence() >= minimumConfidence) {
                                 canvas.drawRect(location, paint);
-
+                                if(TableWare.getInstance().getTargetName() != null){
+                                    tts.speak("해당음식은 "+TableWare.getInstance().getTargetName()+" 입니다", TextToSpeech.QUEUE_FLUSH, null);
+                                }
                                 cropToFrameTransform.mapRect(location);
 
                                 result.setLocation(location);

@@ -12,6 +12,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -23,16 +24,21 @@ import org.tensorflow.lite.examples.detection.env.ImageUtils;
 import org.tensorflow.lite.examples.detection.env.Logger;
 import org.tensorflow.lite.examples.detection.env.Utils;
 import org.tensorflow.lite.examples.detection.tflite.Classifier;
+import org.tensorflow.lite.examples.detection.tflite.TableWare;
 import org.tensorflow.lite.examples.detection.tflite.YoloV4Classifier;
 import org.tensorflow.lite.examples.detection.tracking.MultiBoxTracker;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.5f;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +47,17 @@ public class MainActivity extends AppCompatActivity {
 
         cameraButton = findViewById(R.id.cameraButton);
         detectButton = findViewById(R.id.detectButton);
+        testTTSButton = findViewById(R.id.testTTSButton);
         imageView = findViewById(R.id.imageView);
+
+        tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+                if (i != -1){
+                    tts.setLanguage(Locale.KOREAN);
+                }
+            }
+        });
 
         cameraButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, DetectorActivity.class)));
 
@@ -59,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             }).start();
 
         });
-        this.sourceBitmap = Utils.getBitmapFromAsset(MainActivity.this, "1.jpg");
+        this.sourceBitmap = Utils.getBitmapFromAsset(MainActivity.this, "169.jpg");
 
         this.cropBitmap = Utils.processBitmap(sourceBitmap, TF_OD_API_INPUT_SIZE);
 
@@ -95,7 +111,8 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap sourceBitmap;
     private Bitmap cropBitmap;
 
-    private Button cameraButton, detectButton;
+    private Button cameraButton, detectButton, testTTSButton;
+    private TextToSpeech tts;
     private ImageView imageView;
 
     private void initBox() {
@@ -149,6 +166,10 @@ public class MainActivity extends AppCompatActivity {
             final RectF location = result.getLocation();
             if (location != null && result.getConfidence() >= MINIMUM_CONFIDENCE_TF_OD_API) {
                 canvas.drawRect(location, paint);
+                if(TableWare.getInstance().getTargetName() != null){
+                    tts.speak("해당음식은 "+TableWare.getInstance().getTargetName()+" 입니다", TextToSpeech.QUEUE_FLUSH, null);
+                }
+
 //                cropToFrameTransform.mapRect(location);
 //
 //                result.setLocation(location);
