@@ -89,7 +89,7 @@ public class DetectorTest {
   public void detectionResultsShouldNotChange() throws Exception {
     Canvas canvas = new Canvas(croppedBitmap);
     canvas.drawBitmap(loadImage("table.jpg"), frameToCropTransform, null);
-    final List<Recognition> results = detector.recognizeImage(croppedBitmap);
+    final List<Recognition> results = detector.recognizeImage(croppedBitmap, 2);
     final List<Recognition> expected = loadRecognitions("table_results.txt");
 
     for (Recognition target : expected) {
