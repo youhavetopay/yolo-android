@@ -523,8 +523,10 @@ public class YoloV4Classifier implements Classifier {
                 // spoon이 아닐때
                 if (detection.getDetectedClass() != 0){
                     Log.d("IOU", ""+box_iou(spoon, detection.getLocation()));
-                    if(box_iou(spoon, detection.getLocation()) > 0.1f){
+                    float score = box_iou(spoon, detection.getLocation());
+                    if(TableWare.getInstance().getScore() < score){
                         TableWare.getInstance().setTargetName(detection.getTitle());
+                        TableWare.getInstance().setScore(score);
                     }
 
                 }

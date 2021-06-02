@@ -7,6 +7,7 @@ public class TableWare  {
 
     private RectF location;
     private String targetName = null;
+    private float  score = 0.1f;
     private static TableWare tableWare = new TableWare();
 
     private TableWare(){
@@ -26,11 +27,19 @@ public class TableWare  {
         this.targetName = targetName;
     }
 
+    public void setScore(float score){
+        this.score = score;
+    }
+
     public RectF getLocation() {
         return location;
     }
 
     public String getTargetName() {
         return targetName;
+    }
+
+    public float getScore(){
+        return score;
     }
 }
