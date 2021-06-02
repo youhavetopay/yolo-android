@@ -7,6 +7,7 @@ public class TableWare  {
 
     private RectF location;
     private String targetName = null;
+    private String lastTargetName;
     private float  score = 0.1f;
     private static TableWare tableWare = new TableWare();
 
@@ -31,6 +32,10 @@ public class TableWare  {
         this.score = score;
     }
 
+    public void setLastTargetName(String lastTargetName){
+        this.lastTargetName = lastTargetName;
+    }
+
     public RectF getLocation() {
         return location;
     }
@@ -41,5 +46,9 @@ public class TableWare  {
 
     public float getScore(){
         return score;
+    }
+
+    public String getLastTargetName(){
+        return lastTargetName;
     }
 }

@@ -512,19 +512,23 @@ public class YoloV4Classifier implements Classifier {
                 detections.add(new Recognition("" + i, labels.get(detectedClass), score, rectF, detectedClass));
             }
         }
+        // 만약 숟가락 검출되지 않았다면 TableWare 객체 null로 설정
         if(flag != 1){
             TableWare.getInstance().setLocation(null);
             TableWare.getInstance().setTargetName(null);
-            flag = 0;
+
         }
         else{
             RectF spoon = TableWare.getInstance().getLocation();
             for(Recognition detection: detections){
                 // spoon이 아닐때
                 if (detection.getDetectedClass() != 0){
-                    Log.d("IOU", ""+box_iou(spoon, detection.getLocation()));
                     float score = box_iou(spoon, detection.getLocation());
+                    Log.d("IOU", ""+score);
+
                     if(TableWare.getInstance().getScore() < score){
+                        // 이전에 감지했던거 추가
+                        TableWare.getInstance().setLastTargetName(TableWare.getInstance().getTargetName());
                         TableWare.getInstance().setTargetName(detection.getTitle());
                         TableWare.getInstance().setScore(score);
                     }
