@@ -442,20 +442,13 @@ public class YoloV4Classifier implements Classifier {
         // 클래스 추가되면 첫번째 outputMap 크기 변경하기
         outputMap.put(0, new float[1][OUTPUT_WIDTH_TINY[0]][4]);
         outputMap.put(1, new float[1][OUTPUT_WIDTH_TINY[1]][2]);
-        int check1 = 0;
-        int check2 = 0;
-        if (viewLocation == 1){
-            outputMap.put(0, new float[1][OUTPUT_WIDTH_TINY[0]][4]);
-            outputMap.put(1, new float[1][OUTPUT_WIDTH_TINY[1]][2]);
-            check1 = 0;
-            check2 = 1;
-        }
-        else{
-            outputMap.put(1, new float[1][OUTPUT_WIDTH_TINY[0]][4]);
-            outputMap.put(0, new float[1][OUTPUT_WIDTH_TINY[1]][2]);
-            check1 = 1;
-            check2 = 0;
-        }
+
+//        else{
+//            outputMap.put(1, new float[1][OUTPUT_WIDTH_TINY[0]][4]);
+//            outputMap.put(0, new float[1][OUTPUT_WIDTH_TINY[1]][2]);
+//            check1 = 1;
+//            check2 = 0;
+//        }
         Object[] inputArray = {byteBuffer};
         tfLite.runForMultipleInputsOutputs(inputArray, outputMap);
 
@@ -476,8 +469,8 @@ public class YoloV4Classifier implements Classifier {
          * */
 
         int gridWidth = OUTPUT_WIDTH_TINY[0];
-        float[][][] bboxes = (float[][][]) outputMap.get(check1);
-        float[][][] out_score = (float[][][]) outputMap.get(check2);
+        float[][][] bboxes = (float[][][]) outputMap.get(0);
+        float[][][] out_score = (float[][][]) outputMap.get(1);
 
         int flag = 0;
 
