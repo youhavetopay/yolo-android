@@ -39,6 +39,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
+
+import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.View;
@@ -51,6 +53,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+
 import org.tensorflow.lite.examples.detection.env.ImageUtils;
 import org.tensorflow.lite.examples.detection.env.Logger;
 
@@ -89,7 +93,7 @@ public abstract class CameraActivity extends AppCompatActivity
 
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
-    startActivity(new Intent(this, SplashActivity.class));
+    startActivity(new Intent(this, SplashActivity.class)); // 인트로 화면
     LOGGER.d("onCreate " + this);
     super.onCreate(null);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -187,6 +191,7 @@ public abstract class CameraActivity extends AppCompatActivity
   /** Callback for android.hardware.Camera API */
   @Override
   public void onPreviewFrame(final byte[] bytes, final Camera camera) {
+//    Log.d("test onPreviewFrame", "이거 실행되고 있음1");  지금 이거 실행됨 Camera API 1 사용하고 있는 듯?
     if (isProcessingFrame) {
       LOGGER.w("Dropping frame!");
       return;
@@ -233,6 +238,7 @@ public abstract class CameraActivity extends AppCompatActivity
   @Override
   public void onImageAvailable(final ImageReader reader) {
     // We need wait until we have some size from onPreviewSizeChosen
+//    Log.d("test onImageAvailable", "이거 실행되고 있음2");
     if (previewWidth == 0 || previewHeight == 0) {
       return;
     }

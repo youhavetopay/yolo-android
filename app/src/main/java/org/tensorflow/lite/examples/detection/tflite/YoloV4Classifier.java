@@ -441,7 +441,7 @@ public class YoloV4Classifier implements Classifier {
         Map<Integer, Object> outputMap = new HashMap<>();
         // 클래스 추가되면 첫번째 outputMap 크기 변경하기
         outputMap.put(0, new float[1][OUTPUT_WIDTH_TINY[0]][4]);
-        outputMap.put(1, new float[1][OUTPUT_WIDTH_TINY[1]][2]);
+        outputMap.put(1, new float[1][OUTPUT_WIDTH_TINY[1]][3]);
 
 //        else{
 //            outputMap.put(1, new float[1][OUTPUT_WIDTH_TINY[0]][4]);

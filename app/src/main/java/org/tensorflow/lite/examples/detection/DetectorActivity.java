@@ -57,9 +57,9 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     private static final int TF_OD_API_INPUT_SIZE = 416;
     private static final boolean TF_OD_API_IS_QUANTIZED = false;
-    private static final String TF_OD_API_MODEL_FILE = "yolov4-tiny.tflite";
+    private static final String TF_OD_API_MODEL_FILE = "processing_yolov4-tiny.tflite";
 
-    private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/myClass.txt";
+    private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/processingLabel.txt";
 
     private static final DetectorMode MODE = DetectorMode.TF_OD_API;
     private static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.5f;
@@ -229,7 +229,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                                 // 문제점 하나의 물체는 감지하고 그 뒤 다른걸 한번 더 검출하고 나서야 다시 됨
                                 // 5초뒤 다시 하는 TTS하는 방법으로 구상해봐야 함 21.06.02
                                 if(tableWare.getTargetName() != null && !tableWare.getLastTargetName().equals(tableWare.getTargetName())){
-                                    tts.speak("해당음식은 "+TableWare.getInstance().getTargetName()+" 입니다", TextToSpeech.QUEUE_FLUSH, null);
+                                    //tts.speak("해당음식은 "+TableWare.getInstance().getTargetName()+" 입니다", TextToSpeech.QUEUE_FLUSH, null);
                                 }
                                 cropToFrameTransform.mapRect(location);
 

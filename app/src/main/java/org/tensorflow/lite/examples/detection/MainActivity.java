@@ -91,9 +91,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static final boolean TF_OD_API_IS_QUANTIZED = false;
 
-    private static final String TF_OD_API_MODEL_FILE = "yolov4-tiny.tflite";
+    private static final String TF_OD_API_MODEL_FILE = "processing_yolov4-tiny.tflite";
 
-    private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/myClass.txt";
+    private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/processingLabel.txt";
 
     // Minimum detection confidence to track a detection.
     private static final boolean MAINTAIN_ASPECT = false;
