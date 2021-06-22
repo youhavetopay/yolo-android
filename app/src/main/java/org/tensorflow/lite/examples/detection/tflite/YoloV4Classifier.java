@@ -498,6 +498,7 @@ public class YoloV4Classifier implements Classifier {
                         Math.max(0, yPos - h / 2),
                         Math.min(bitmap.getWidth() - 1, xPos + w / 2),
                         Math.min(bitmap.getHeight() - 1, yPos + h / 2));
+                System.out.println("이거 감지함    "+labels.get(detectedClass));
                 if (detectedClass == 0){
                     TableWare.getInstance().setLocation(rectF);
                     flag = 1;
