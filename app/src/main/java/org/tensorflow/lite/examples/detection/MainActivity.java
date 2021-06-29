@@ -91,9 +91,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static final boolean TF_OD_API_IS_QUANTIZED = false;
 
-    private static final String TF_OD_API_MODEL_FILE = "processing_yolov4-tiny.tflite";
+    private static final String TF_OD_API_MODEL_FILE = "now_yolov4-tiny-tf.tflite";
 
-    private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/processingLabel.txt";
+    private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/myClass.txt";
 
     // Minimum detection confidence to track a detection.
     private static final boolean MAINTAIN_ASPECT = false;
@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
             if (location != null && result.getConfidence() >= MINIMUM_CONFIDENCE_TF_OD_API) {
                 canvas.drawRect(location, paint);
                 if(TableWare.getInstance().getTargetName() != null){
-                    tts.speak("해당음식은 "+TableWare.getInstance().getTargetName()+" 입니다", TextToSpeech.QUEUE_FLUSH, null);
+//                    tts.speak("해당음식은 "+TableWare.getInstance().getTargetName()+" 입니다", TextToSpeech.QUEUE_FLUSH, null);
                 }
 
 //                cropToFrameTransform.mapRect(location);
@@ -180,5 +180,14 @@ public class MainActivity extends AppCompatActivity {
 //        tracker.trackResults(mappedRecognitions, new Random().nextInt());
 //        trackingOverlay.postInvalidate();
         imageView.setImageBitmap(bitmap);
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (tts != null){
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
     }
 }
