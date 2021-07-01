@@ -228,9 +228,9 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                                 // 식기도구가 검출되었고 이전에 검출했던 값이랑 다르면 TTS 출력 (임시로 해둔거)
                                 // 문제점 하나의 물체는 감지하고 그 뒤 다른걸 한번 더 검출하고 나서야 다시 됨
                                 // 5초뒤 다시 하는 TTS하는 방법으로 구상해봐야 함 21.06.02
-                                if(tableWare.getTargetName() != null && !tableWare.getLastTargetName().equals(tableWare.getTargetName())){
-                                    //tts.speak("해당음식은 "+TableWare.getInstance().getTargetName()+" 입니다", TextToSpeech.QUEUE_FLUSH, null);
-                                }
+//                                if(tableWare.getTargetName() != null && !tableWare.getLastTargetName().equals(tableWare.getTargetName())){
+//                                    tts.speak("해당음식은 "+TableWare.getInstance().getTargetName()+" 입니다", TextToSpeech.QUEUE_FLUSH, null);
+//                                }
                                 cropToFrameTransform.mapRect(location);
 
                                 result.setLocation(location);
